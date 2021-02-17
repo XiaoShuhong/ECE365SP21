@@ -269,7 +269,7 @@ class Question2(object):
                 tra_labels=trainlabels[left_index][0]
                 classifier.fit(tra_data,tra_labels)
                 est=classifier.predict(val_data)
-                err[i]=zero_one_loss(est,val_labels)
+                err[i]+=zero_one_loss(est,val_labels)/5
         return err
 
     def minimizer_K(self, traindata, trainlabels, k):
@@ -362,19 +362,14 @@ class Question3(object):
         3. min_err              Float. The correponding minimum error.
         """
         # Put your code below
-        c=[2**i for i in range(-5,16,1) ]
-        g=[2**j for j in range(-15,4,1) ]
-        err=np.zeros((len(c),len(g)))
-        for i in range(len(c)):
-            for j in range(len(g)):
-                classifier=SVC(C=c[i],gamma=g[j])
-                err[i][j]=1-cross_val_score(classifier,traindata,trainlabels,cv=5).mean()
-        idx=np.argmin(err)
-        idx_c=idx//len(g)
-        idx_g=idx-len(g)*idx_c
-        C_min=c[idx_c]
-        gamma_min=g[idx_g]
-        min_err=err[idx_c][idx_g]
+        parameters = {'C':[2 ** i for i in range(-5, 16)], 'gamma':[2 ** i for i in range(-15, 4)]}
+    
+        classifier=GridSearchCV( SVC(), param_grid=parameters,cv=10)
+        classifier.fit(traindata,trainlabels)
+        C_min=classifier.best_params_['C']
+        gamma_min=classifier.best_params_['gamma']
+        score= classifier.best_score_
+        min_err=1-score
         # Do not change this sequence!
         return (C_min, gamma_min, min_err)
 
@@ -392,14 +387,13 @@ class Question3(object):
         2. min_err              Float. The correponding minimum error.
         """
         # Put your code below
-        c=[2**i for i in range(-14,15,1)]
-        err=[]
-        for i in c:
-            classifier=LogisticRegression(max_iter=1000,solver='lbfgs',C=i)
-            err.append(1-cross_val_score(classifier,traindata,trainlabels,cv=5).mean())
-        idx=np.argmin(err)
-        C_min=c[idx]
-        min_err=err[idx]
+        parameters = {'C':[2 ** i for i in range(-5, 16)]}
+    
+        classifier=GridSearchCV(LogisticRegression(), param_grid=parameters,cv=10)
+        classifier.fit(traindata,trainlabels)
+        C_min=classifier.best_params_['C']
+        score= classifier.best_score_
+        min_err=1-score
         # Do not change this sequence!
         return (C_min, min_err)
 
@@ -418,9 +412,10 @@ class Question3(object):
         """
         # Put your code below
         from sklearn.metrics import zero_one_loss
-        classifier=LogisticRegression(max_iter=1000,solver='lbfgs',C=1)
-        classifier.fit(traindata,trainlabels)
-        est=classifier.predict(testdata)
-        testError=zero_one_loss(est,testlabels)
+        classifier = SVC( C=8.0, gamma=0.125)
+        classifier.fit(traindata, trainlabels)
+        predict_labels = classifier.predict(testdata)
+        testError = error(predict_labels, testlabels)
+
         # Do not change this sequence!
         return (classifier, testError)
