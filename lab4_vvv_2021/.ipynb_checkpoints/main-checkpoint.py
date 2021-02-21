@@ -25,7 +25,7 @@ class Question1(object):
         """
         np.random.seed(12312)
         # Put your code below
-        cluster_idx=np.random.randint(data.shape[0],size=K)
+        cluster_idx=np.random.choice(data.shape[0] , K, replace=False)
         centers=data[cluster_idx,:]
         labels=np.zeros(data.shape[0])
         for i in range(niter):
