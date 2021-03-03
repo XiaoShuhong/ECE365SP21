@@ -75,6 +75,7 @@ class Question1(object):
        
         u,s,v=np.linalg.svd(data)
         Wsvd=v.T
+        Wsvd=Wsvd.T
         ssvd=s**2/data.shape[0]
         return Wsvd, ssvd
         
@@ -90,12 +91,11 @@ class Question2(object):
         1. pca      The PCA object fit on X 
         2. unexpv   A (200,) numpy ndarray, where the i-th element contains the percentage of unexplained variance on X by retaining i+1 principal components
         """
-        k=np.arange(1,201)
-        unexpv=np.zeros(len(k))
-        for i in range(len(k)):
-            pca=PCA(n_components=k[i])
-            pca.fit(X)
-            unexpv[i]=(1-pca.explained_variance_ratio_.sum())
+        pca = PCA()
+        pca.fit(X)
+        unexpv=np.zeros(200)
+        for i in range(0,200):
+            unexpv[i]=np.sum(pca.explained_variance_ratio_[i+1:])
         return pca,unexpv
     
     def pca_approx(self, X_t, pca, i):
@@ -152,6 +152,6 @@ class Question3(object):
             ve[i-1]=zero_one_loss(est,vallabels)
         idx=np.argmin(ve)
         min_ve=ve[idx]
-        pca_feat=idx+1
+        pca_feat=idx
         return ve, min_ve, pca_feat
     
