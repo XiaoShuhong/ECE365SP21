@@ -152,6 +152,6 @@ class Question3(object):
             ve[i-1]=zero_one_loss(est,vallabels)
         idx=np.argmin(ve)
         min_ve=ve[idx]
-        pca_feat=idx
+        pca_feat=idx+1
         return ve, min_ve, pca_feat
     
